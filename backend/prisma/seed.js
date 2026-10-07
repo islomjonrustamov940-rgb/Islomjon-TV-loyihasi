@@ -9,35 +9,40 @@ async function main() {
         description: "Pandora olamidagi fantastik sarguzashtlar davomi",
         genre: "Sci-Fi",
         duration: 192,
-        rating: 7.8
+        rating: 7.8,
+        userId: "test_user"
       },
       {
         title: "Interstellar",
         description: "Insoniyatni qutqarish uchun koinot va vaqt bo'ylab sayohat",
         genre: "Sci-Fi",
         duration: 169,
-        rating: 8.7
+        rating: 8.7,
+        userId: "test_user"
       },
       {
         title: "Uyda Yolg'iz",
         description: "Yangi yil bayramidagi qiziqarli va kulgili voqealar",
         genre: "Comedy",
         duration: 103,
-        rating: 7.7
+        rating: 7.7,
+        userId: "test_user"
       },
       {
         title: "Kung Fu Panda",
         description: "Ajdaho jangchisiga aylangan Po ismli panda sarguzashtlari",
         genre: "Animation",
         duration: 92,
-        rating: 7.6
+        rating: 7.6,
+        userId: "test_user"
       },
       {
         title: "Inception",
         description: "Tushlar ichiga kirib ma'lumot o'g'irlash haqidagi o'tkir syujetli film",
         genre: "Action",
         duration: 148,
-        rating: 8.8
+        rating: 8.8,
+        userId: "test_user"
       }
     ]
   });

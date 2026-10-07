@@ -1,6 +1,5 @@
 const API_URL = 'http://localhost:3000/api/movies';
 
-// API'dan filmlarni yuklab olish funksiyasi
 async function fetchMovies() {
   try {
     const response = await fetch(API_URL);
@@ -12,13 +11,12 @@ async function fetchMovies() {
   }
 }
 
-// Filmlarni HTML ga chiqarish funksiyasi
+
 function displayMovies(movies) {
   const container = document.getElementById('movies-container');
   if (!container) return;
 
-  container.innerHTML = ''; // Ekranni tozalash
-
+  container.innerHTML = ''; 
   movies.forEach(movie => {
     const card = document.createElement('div');
     card.className = 'movie-card';
@@ -32,5 +30,4 @@ function displayMovies(movies) {
   });
 }
 
-// Sahifa yuklanganda ishga tushirish
 document.addEventListener('DOMContentLoaded', fetchMovies);
