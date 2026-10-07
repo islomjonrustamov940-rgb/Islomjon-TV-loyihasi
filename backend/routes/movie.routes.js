@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/movie.controller');
 const validate = require('../middlewares/validate');
-const { requireAuth } = require('../middlewares/auth.middleware');
+const { requireAuth } = require('../middlewares/auth.middlewares');
 const {
   createMovieSchema,
   updateMovieSchema,

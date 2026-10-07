@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { createMovieSchema, updateMovieSchema } = require('./movie.schema');
+const { createMovieSchema, updateMovieSchema } = require('../validations/movie.validation');
 
 const prisma = new PrismaClient();
 
