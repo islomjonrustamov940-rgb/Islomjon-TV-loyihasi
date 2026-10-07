@@ -1,6 +1,4 @@
-const { use } = require('react');
 const { z } = require('zod');
-const { id } = require('zod/v4/locales');
 
 const createMovieSchema = z.object({
   title: z.string().min(2, "Sarlavha kamida 2 ta belgidan iborat bo'lishi kerak"),
