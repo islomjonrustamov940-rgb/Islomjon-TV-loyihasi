@@ -2,6 +2,36 @@ import { SignInButton, SignUpButton } from '@clerk/react';
 import heroImg from "../assets/IslomjonTV.jpg";
 
 function Home() {
+
+  async function handleHealthCheck() {
+    try {
+      const response = await fetch("http://localhost:3000/health");
+      const data = await response.json();
+      console.log(data);
+
+      if (data.success) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "fixed bottom-4 right-4 z-50 flex items-center gap-2";
+
+        const indicator = document.createElement("div");
+        indicator.className = "w-4 h-4 bg-green-500 rounded-full shadow-lg";
+        indicator.title = "Backend ishladi";
+
+        const label = document.createElement("span");
+        label.className = "text-sm font-medium text-green-300";
+        label.textContent = "Backend ishladi";
+
+        wrapper.appendChild(indicator);
+        wrapper.appendChild(label);
+        document.body.appendChild(wrapper);
+      }
+    } catch (error) {
+      console.error("Health check failed:", error);
+    }
+  }
+
+  handleHealthCheck(); // Sog'liqni tekshirishni chaqirish
+
   return (
     <div
       className="relative flex flex-col items-center justify-center min-h-screen px-4 text-center bg-cover bg-no-repeat"
