@@ -23,7 +23,7 @@
               </SignUpButton>
             </Show>
 
-            <Show when="signed-in">
+            <Show when="signed-in" >
               <UserButton afterSignOutUrl="/" />
             </Show>
           </div>

@@ -1,88 +1,46 @@
-import { SignInButton, SignUpButton } from '@clerk/react';
-import heroImg from "../assets/IslomjonTV.jpg";
+import React from 'react';
 
-function Home() {
-
-  async function handleHealthCheck() {
-    try {
-      const response = await fetch("http://localhost:3000/health");
-      const data = await response.json();
-      console.log(data);
-
-      if (data.success) {
-        const wrapper = document.createElement("div");
-        wrapper.className = "fixed bottom-4 right-4 z-50 flex items-center gap-2";
-
-        const indicator = document.createElement("div");
-        indicator.className = "w-4 h-4 bg-green-500 rounded-full shadow-lg";
-        indicator.title = "Backend ishladi";
-
-        const label = document.createElement("span");
-        label.className = "text-sm font-medium text-green-300";
-        label.textContent = "Backend ishladi";
-
-        wrapper.appendChild(indicator);
-        wrapper.appendChild(label);
-        document.body.appendChild(wrapper);
-      }
-    } catch (error) {
-      console.error("Health check failed:", error);
-    }
-  }
-
-  handleHealthCheck(); // Sog'liqni tekshirishni chaqirish
-
+export default function HomePage({ onStart }) {
   return (
-    <div
-      className="relative flex flex-col items-center justify-center min-h-screen px-4 text-center bg-cover bg-no-repeat"
-      style={{
-        backgroundImage: `url(${heroImg})`,
-        backgroundPosition: "center 75%",
-      }}
-    >
-      {/* Rasm ustidagi matnlar yaxshi o'qilishi va kino atmosferasini berishi uchun qorong'u overlay */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"></div>
+    <div style={{
+      minHeight: '100vh',
+      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=1200")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      color: '#fff',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      {/* Navbar */}
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 50px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>Islomjon TV</h2>
+        <div>
+          <a href="#login" style={{ color: '#fff', marginRight: '20px', textDecoration: 'none' }}>Kirish</a>
+          <a href="#register" style={{ color: '#fff', textDecoration: 'none' }}>Ro'yxatdan o'tish</a>
+        </div>
+      </nav>
 
-      {/* Kontent bo'limi */}
-      <div className="relative z-10 max-w-3xl mx-auto space-y-6">
-        
-        {/* Sarlavha (Hover effekti: rang o'zgarishi va ozgina kattalashishi) */}
-        <h1 className="text-4xl sm:text-6xl font-black text-white tracking-wide drop-shadow-lg transform transition duration-300 hover:scale-105 hover:text-red-500 cursor-default">
-          Islomjon TV 🎬
-        </h1>
-
-        {/* Ostki sarlavha */}
-        <p className="text-xl sm:text-2xl font-semibold text-gray-200 drop-shadow transform transition duration-300 hover:text-yellow-400 cursor-default">
+      {/* Hero Content */}
+      <div style={{ textAlign: 'center', marginTop: '120px', padding: '0 20px' }}>
+        <h1 style={{ fontSize: '48px', marginBottom: '15px' }}>Islomjon TV 🎬</h1>
+        <p style={{ fontSize: '20px', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto 10px' }}>
           Cheksiz filmlar, premyeralar va seriallar olamiga xush kelibsiz!
         </p>
-
-        {/* Tavsif matni (Hover effekti: ravshanlashish va nur taratish) */}
-        <p className="text-base sm:text-lg text-gray-300 max-w-xl mx-auto leading-relaxed transition duration-300 hover:text-white cursor-default">
-          Eron, Turkiy, Hollivud va Milliy kinosanoatining eng sara asarlarini yuqori <span className="text-red-400 font-bold">HD/4K</span> sifatda va professional dublyajda tomosha qiling.
+        <p style={{ fontSize: '14px', color: '#aaa', marginBottom: '30px' }}>
+          Gollivud, Turkiya va Milliy kinosanoatining eng sara asarlarini yuqori HD/4K sifatda tomosha qiling.
         </p>
 
-        {/* Tugmalar bo'limi */}
-        <div className="flex flex-wrap gap-5 justify-center pt-4">
-          
-          {/* Boshlash (Ro'yxatdan o'tish) Tugmasi */}
-          <SignUpButton mode="modal">
-            <button className="px-8 py-3.5 bg-red-600 text-white rounded-full font-bold text-lg shadow-lg hover:bg-red-700 hover:shadow-red-600/50 hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300">
-              ▶ Bepul Tomosha Qilish
-            </button>
-          </SignUpButton>
-
-          {/* Kirish Tugmasi */}
-          <SignInButton mode="modal">
-            <button className="px-8 py-3.5 bg-white/10 backdrop-blur-md border-2 border-white/40 text-white rounded-full font-bold text-lg hover:bg-white hover:text-black hover:border-white hover:scale-110 active:scale-95 transition-all duration-300">
-              🔑 Hisobga Kirish
-            </button>
-          </SignInButton>
-
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
+          <button 
+            onClick={onStart} 
+            style={{ padding: '12px 25px', backgroundColor: '#e50914', color: '#fff', border: 'none', borderRadius: '5px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            ▶ Bepul Tomosha Qilish
+          </button>
+          <button style={{ padding: '12px 25px', backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', border: '1px solid #fff', borderRadius: '5px', fontSize: '16px', cursor: 'pointer' }}>
+            🔑 Hisobga Kirish
+          </button>
         </div>
-
       </div>
     </div>
   );
 }
-
-export default Home;
