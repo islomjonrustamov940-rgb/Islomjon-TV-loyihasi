@@ -58,8 +58,20 @@ const fetchVideos = async () => {
 
 function MovieDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
-  const [userImage, setUserImage] = useState('https://i.pravatar.cc/150?img=12');
+  const [authMode, setAuthMode] = useState('register'); // Odatiy rejim: register
+  
+  // Auth Form State va Validation
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+
+  // Profil foydalanuvchi ma'lumotlari
+  const [userName, setUserName] = useState('');
+  const [userImage, setUserImage] = useState('');
+
+  // Foydalanuvchining oldingi o'zgartirgan ism va rasmini eslab qolish uchun
+  const [savedCustomName, setSavedCustomName] = useState('');
+  const [savedCustomImage, setSavedCustomImage] = useState('');
 
   const [activeVideoItem, setActiveVideoItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -83,6 +95,78 @@ function MovieDashboard() {
   if (error) return <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>Xatolik yuz berdi!</div>;
 
   const allItems = [...serverItems, ...localItems].filter(item => !deletedIds.includes(item.id));
+
+  // Tizimdan chiqish funksiyasi
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setEmailInput('');
+    setPasswordInput('');
+    setAuthError('');
+  };
+
+  // Tizimga kirish yoki Ro'yxatdan o'tishni boshqaruvchi funksiya
+  const handleAuthSubmit = (e) => {
+    if (e) e.preventDefault();
+    
+    if (!emailInput.trim() || !passwordInput.trim()) {
+      setAuthError("Iltimos, email va parolni to'liq kiriting!");
+      return;
+    }
+
+    if (!emailInput.includes('@')) {
+      setAuthError("Iltimos, to'g'ri email manzil kiriting!");
+      return;
+    }
+
+    // Email dagi @ oldidagi qismdan faqat harflarni (ismni) ajratib olish
+    const emailPrefix = emailInput.split('@')[0];
+    const onlyLettersName = emailPrefix.replace(/[^a-zA-Z]/g, '');
+    const finalName = onlyLettersName ? onlyLettersName : emailPrefix;
+    const formattedName = finalName.charAt(0).toUpperCase() + finalName.slice(1);
+
+    if (authMode === 'register') {
+      // Ro'yxatdan o'tsa: Har doim email'ga moslashadi va rasm birinchi harf bo'lib qoladi
+      setUserName(formattedName);
+      setUserImage('');
+      setSavedCustomName(''); // Eski o'zgartirilgan ismni nolga tushirish
+      setSavedCustomImage(''); // Eski rasmni nolga tushirish
+    } else {
+      // Hisobga kirsa (Login):
+      // Agar oldin ism va rasm o'zgartirilgan bo'lsa, o'sha eski o'zi qo'ygan holati tiklanadi, aks holda email dagi holati
+      setUserName(savedCustomName ? savedCustomName : formattedName);
+      setUserImage(savedCustomImage ? savedCustomImage : '');
+    }
+
+    setAuthError('');
+    setIsLoggedIn(true);
+  };
+
+  // Foydalanuvchi o'z ismini o'zgartirishi uchun funksiya
+  const handleChangeUserName = () => {
+    const newName = prompt("Yangi ismingizni kiriting:", userName);
+    if (newName && newName.trim()) {
+      const trimmed = newName.trim();
+      setUserName(trimmed);
+      setSavedCustomName(trimmed); // Keyingi safar Login qilganda eslab qoladi
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setUserImage(imageUrl);
+      setSavedCustomImage(imageUrl); // Keyingi safar Login qilganda eslab qoladi
+    }
+  };
+
+  const handleChangeImageByUrl = () => {
+    const newUrl = prompt("Rasm havolasini (URL) kiriting:", userImage);
+    if (newUrl) {
+      setUserImage(newUrl);
+      setSavedCustomImage(newUrl); // Keyingi safar Login qilganda eslab qoladi
+    }
+  };
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -117,20 +201,8 @@ function MovieDashboard() {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setUserImage(imageUrl);
-    }
-  };
-
-  const handleChangeImageByUrl = () => {
-    const newUrl = prompt("Rasm havolasini (URL) kiriting:", userImage);
-    if (newUrl) {
-      setUserImage(newUrl);
-    }
-  };
+  // Profile rasmi o'rnida ko'rsatiladigan avatar (fayl bo'lsa rasm, yo'q bo'lsa Ismning 1-harfi)
+  const firstLetter = userName ? userName.charAt(0).toUpperCase() : 'U';
 
   // 1. TIZIMGA KIRGAN HOLATI (DASHBOARD)
   if (isLoggedIn) {
@@ -152,8 +224,20 @@ function MovieDashboard() {
           </h3>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '14px', fontWeight: '600', color: '#f8fafc' }}>
+                {userName}
+              </span>
+              <button 
+                onClick={handleChangeUserName}
+                style={{ background: 'none', border: 'none', color: '#38bdf8', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+              >
+                (O'zgartirish)
+              </button>
+            </div>
+
             <button 
-              onClick={() => setIsLoggedIn(false)}
+              onClick={handleLogout}
               style={{
                 backgroundColor: '#ffe3e3',
                 color: '#d6336c',
@@ -168,7 +252,7 @@ function MovieDashboard() {
               Chiqish
             </button>
 
-            {/* Profil rasmi */}
+            {/* Profil rasmi yoki Birinchi Harf */}
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
               <label htmlFor="profile-upload" style={{ cursor: 'pointer', display: 'block' }}>
                 <div style={{
@@ -180,14 +264,21 @@ function MovieDashboard() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: '#38bdf8'
+                  backgroundColor: '#0284c7',
+                  color: '#ffffff',
+                  fontWeight: 'bold',
+                  fontSize: '18px'
                 }}>
-                  <img 
-                    src={userImage} 
-                    alt="Profile" 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
+                  {userImage ? (
+                    <img 
+                      src={userImage} 
+                      alt="Profile" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={() => setUserImage('')}
+                    />
+                  ) : (
+                    firstLetter
+                  )}
                 </div>
               </label>
 
@@ -427,42 +518,81 @@ function MovieDashboard() {
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px' }}>
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, color: '#e50914' }}>Islomjon TV</h2>
         <div>
-          <button onClick={() => setAuthMode('login')} style={{ background: 'transparent', color: '#fff', border: 'none', marginRight: '20px', cursor: 'pointer', fontSize: '15px' }}>
-            Kirish
+          <button onClick={() => { setAuthMode('login'); setAuthError(''); }} style={{ background: 'transparent', color: '#fff', border: 'none', marginRight: '20px', cursor: 'pointer', fontSize: '15px', fontWeight: authMode === 'login' ? 'bold' : 'normal' }}>
+            Hisobga kirish
           </button>
-          <button onClick={() => setAuthMode('register')} style={{ background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '15px' }}>
+          <button onClick={() => { setAuthMode('register'); setAuthError(''); }} style={{ background: 'transparent', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '15px', fontWeight: authMode === 'register' ? 'bold' : 'normal' }}>
             Ro'yxatdan o'tish
           </button>
         </div>
       </nav>
 
-      <div style={{ textAlign: 'center', marginTop: '60px', padding: '0 20px' }}>
+      <div style={{ textAlign: 'center', marginTop: '40px', padding: '0 20px' }}>
         <h1 style={{ fontSize: '48px', marginBottom: '15px', fontWeight: 'bold' }}>Islomjon TV 🎬</h1>
         <p style={{ fontSize: '20px', color: '#e0e0e0', maxWidth: '700px', margin: '0 auto 10px' }}>
           Cheksiz filmlar, premyeralar va seriallar olamiga xush kelibsiz!
         </p>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', margin: '30px 0 40px' }}>
-          <button onClick={() => setIsLoggedIn(true)} style={{ padding: '12px 28px', backgroundColor: '#e50914', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
-            ▶ Bepul Tomosha Qilish
-          </button>
-          <button onClick={() => setIsLoggedIn(true)} style={{ padding: '12px 28px', backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.5)', borderRadius: '6px', fontSize: '16px', cursor: 'pointer' }}>
-            🔑 Hisobga Kirish
-          </button>
-        </div>
-
         {/* Ro'yxatdan o'tish va Kirish formasi */}
-        <div style={{ maxWidth: '380px', margin: '0 auto', background: 'rgba(15, 23, 42, 0.95)', padding: '30px', borderRadius: '12px', border: '1px solid #334155' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '20px', fontSize: '20px' }}>
-            {authMode === 'login' ? 'Hisobga Kirish' : "Ro'yxatdan o'tish"}
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <input type="email" placeholder="Email yoki telefon..." style={{ padding: '12px', borderRadius: '6px', border: '1px solid #475569', background: '#0f172a', color: '#fff', outline: 'none' }} />
-            <input type="password" placeholder="Parol..." style={{ padding: '12px', borderRadius: '6px', border: '1px solid #475569', background: '#0f172a', color: '#fff', outline: 'none' }} />
-            <button onClick={() => setIsLoggedIn(true)} style={{ padding: '12px', backgroundColor: '#e50914', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px', marginTop: '5px' }}>
-              {authMode === 'login' ? 'Kirish' : "Ro'yxatdan o'tish"}
+        <div style={{ maxWidth: '380px', margin: '30px auto', background: 'rgba(15, 23, 42, 0.95)', padding: '30px', borderRadius: '12px', border: '1px solid #334155' }}>
+          
+          {/* Birinchi sahifada ikkala tab tugmalari */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #334155', paddingBottom: '10px' }}>
+            <button 
+              type="button"
+              onClick={() => { setAuthMode('register'); setAuthError(''); }}
+              style={{
+                flex: 1, padding: '8px', background: authMode === 'register' ? '#e50914' : 'transparent',
+                color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px'
+              }}
+            >
+              Ro'yxatdan o'tish
+            </button>
+            <button 
+              type="button"
+              onClick={() => { setAuthMode('login'); setAuthError(''); }}
+              style={{
+                flex: 1, padding: '8px', background: authMode === 'login' ? '#e50914' : 'transparent',
+                color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px'
+              }}
+            >
+              Hisobga kirish
             </button>
           </div>
+
+          <form onSubmit={handleAuthSubmit}>
+            {authError && (
+              <div style={{ color: '#ef4444', fontSize: '13px', marginBottom: '12px', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '8px', borderRadius: '6px', border: '1px solid #ef4444' }}>
+                {authError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <input 
+                type="email" 
+                required
+                placeholder="Email manzilingiz..." 
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                style={{ padding: '12px', borderRadius: '6px', border: '1px solid #475569', background: '#0f172a', color: '#fff', outline: 'none' }} 
+              />
+              <input 
+                type="password" 
+                required
+                placeholder="Parolingiz..." 
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                style={{ padding: '12px', borderRadius: '6px', border: '1px solid #475569', background: '#0f172a', color: '#fff', outline: 'none' }} 
+              />
+              <button 
+                type="submit" 
+                style={{ padding: '12px', backgroundColor: '#e50914', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '15px', marginTop: '5px' }}
+              >
+                {authMode === 'login' ? 'Hisobga kirish' : "Ro'yxatdan o'tish"}
+              </button>
+            </div>
+          </form>
+
         </div>
 
       </div>
